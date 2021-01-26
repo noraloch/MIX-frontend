@@ -28,62 +28,53 @@ const getTastes = () => {
 // ******************* Dom Manipulation / functions *****************
 
 const showSideBar = (categoriesArray) => {
-  // console.log(categoriesArray)
   const menuDiv = document.createElement('div')
   cocktailCardDiv.append(menuDiv)
-  console.log(menuDiv)
   categoriesArray.forEach(category =>{
     menuDiv.innerHTML += `
       <a class="item active">${category.name}</a>
     `
   })
 }
-/* <div class="ui card">
+
+const renderCocktail = (cocktail) => {
+  cocktailCardDiv.innerHTML+=
+   `
+  <div class="ui card">
   <div class="image">
     <img src=${cocktail.image}>
   </div>
   <div class="content">
     <a class="header">${cocktail.name}</a>
     <div class="meta">
-      <span class="date">${cocktail.description}</span>
+      <span class="date">${cocktail.recipe}</span>
     </div>
     <div class="description">
-      Reviews Loop
+      ${cocktail.reviews.map((review) => renderReview(review))}
     </div>
   </div>
   <div class="extra content">
     <a>
       <i class="user icon"></i>
-      ${ratingAve} Average
+      Average Rating: ${calculateAverage(cocktail)}
     </a>
   </div>
-</div> */
-const renderCocktail = (cocktail) => {
-  const nameHeading = document.createElement("h2");
-  const image = document.createElement("img");
-  const recipeDiv = document.createElement("div");
-  nameHeading.textContent = cocktail.name;
-  image.src = cocktail.image;
-  recipeDiv.textContent = cocktail.recipe;
-  cocktailCardDiv.append(nameHeading, image, recipeDiv);
-
-  calculateAverage(cocktail);
-
-  cocktail.reviews.forEach((review) => renderReview(review));
+</div>
+`  
 };
 
 const calculateAverage = (cocktail) => {
   ratingsArray = cocktail.reviews.map((review) => review.rating);
   ratingsSum = ratingsArray.reduce((a, b) => a + b, 0);
   ratingsAve = ratingsSum / ratingsArray.length;
-  renderAve(ratingsAve);
+  return renderAve(ratingsAve);
 };
 
 const renderAve = (ratingsAve) => {
-  const ratingsAveDiv = document.createElement("div");
-  ratingsAveDiv.textContent = `Average Rating: ${ratingsAve}`;
-  cocktailCardDiv.append(ratingsAveDiv);
-  
+  return `
+  <div class="ratings-average">${ratingsAve}</div>
+  `
+  //star rating possible solution to use later
   // for (let i=1; i<ratingsAve; i++) {
   //   const starDiv = document.createElement("div");
   //   starDiv.className = "star" //add CSS overflow:hidden for half stars, display: inline-block to show horizontal
@@ -93,11 +84,10 @@ const renderAve = (ratingsAve) => {
 };
 
 const renderReview = (review) => {
-  const ratingDiv = document.createElement("div");
-  const reviewDiv = document.createElement("div");
-  ratingDiv.textContent = review.rating;
-  reviewDiv.textContent = review.review_text;
-  cocktailCardDiv.append(ratingDiv, reviewDiv);
+  return `
+    <div class="rating">${review.rating}</div>
+    <div class="review">${review.review_text}</div>
+  `
 };
 
 
