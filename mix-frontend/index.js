@@ -1,7 +1,7 @@
 // ******************* Dom Elements *****************
 
 const cocktailCardDiv = document.querySelector(".cocktail-cards");
-const verticalMenuDiv = document.querySelector(".ui vertical fluid tabular menu")
+const verticalMenuDiv = Array.from(document.getElementsByClassName("ui vertical fluid tabular menu"))[0]
 // ******************* Network Requests *****************
 const getCocktails = () => {
   return fetch("http://localhost:3000/cocktails").then((response) =>
@@ -28,13 +28,10 @@ const getTastes = () => {
 // ******************* Dom Manipulation / functions *****************
 
 const showSideBar = (categoriesArray) => {
-  // console.log(categoriesArray)
-  const menuDiv = document.createElement('div')
-  cocktailCardDiv.append(menuDiv)
-  console.log(menuDiv)
   categoriesArray.forEach(category =>{
-    menuDiv.innerHTML += `
-      <a class="item active">${category.name}</a>
+    console.log(verticalMenuDiv)
+    verticalMenuDiv.innerHTML += `
+      <a class="item">${category.name}</a>
     `
   })
 }
