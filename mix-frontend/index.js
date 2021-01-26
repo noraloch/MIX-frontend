@@ -1,5 +1,7 @@
 // ******************* Dom Elements *****************
+
 const cocktailCardDiv = document.querySelector(".cocktail-cards");
+const  verticalMenuDiv = document.querySelector(".ui vertical fluid tabular menu")
 // ******************* Network Requests *****************
 const getCocktails = () => {
   return fetch("http://localhost:3000/cocktails").then((response) =>
@@ -59,3 +61,21 @@ const renderReview = (review) => {
   reviewDiv.textContent = review.review_text;
   cocktailCardDiv.append(ratingDiv, reviewDiv);
 };
+
+const getTastes = () => {
+  fetch("http://localhost:3000/cocktails")
+  .then(res => res.json())
+  .then(showSideBar)
+}
+// ******************* Events Listeners *****************
+
+// ******************* Dom Manipulation / functions *****************
+
+
+const showSideBar= (categoriesArray) => {
+  categoriesArray.forEach(category =>{
+    verticalMenuDiv.innerHTML += `
+      <a class="item active">${category.name}</a>
+    `
+  })
+}
