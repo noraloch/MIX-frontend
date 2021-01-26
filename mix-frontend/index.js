@@ -1,7 +1,7 @@
 // ******************* Dom Elements *****************
 
 const cocktailCardDiv = document.querySelector(".cocktail-cards");
-const  verticalMenuDiv = document.querySelector(".ui vertical fluid tabular menu")
+const verticalMenuDiv = document.querySelector(".ui vertical fluid tabular menu")
 // ******************* Network Requests *****************
 const getCocktails = () => {
   return fetch("http://localhost:3000/cocktails").then((response) =>
@@ -19,22 +19,45 @@ getAndRenderCocktails();
 
 // categories
 const getTastes = () => {
-  fetch("http://localhost:3000/cocktails")
+  fetch("http://localhost:3000/categories")
   .then(res => res.json())
-  .then(showSideBar)
+  .then(categoriesArray => showSideBar(categoriesArray))
 }
 // ******************* Events Listeners *****************
 
 // ******************* Dom Manipulation / functions *****************
 
-const showSideBar= (categoriesArray) => {
+const showSideBar = (categoriesArray) => {
+  // console.log(categoriesArray)
+  const menuDiv = document.createElement('div')
+  cocktailCardDiv.append(menuDiv)
+  console.log(menuDiv)
   categoriesArray.forEach(category =>{
-    verticalMenuDiv.innerHTML += `
+    menuDiv.innerHTML += `
       <a class="item active">${category.name}</a>
     `
   })
 }
-
+/* <div class="ui card">
+  <div class="image">
+    <img src=${cocktail.image}>
+  </div>
+  <div class="content">
+    <a class="header">${cocktail.name}</a>
+    <div class="meta">
+      <span class="date">${cocktail.description}</span>
+    </div>
+    <div class="description">
+      Reviews Loop
+    </div>
+  </div>
+  <div class="extra content">
+    <a>
+      <i class="user icon"></i>
+      ${ratingAve} Average
+    </a>
+  </div>
+</div> */
 const renderCocktail = (cocktail) => {
   const nameHeading = document.createElement("h2");
   const image = document.createElement("img");
@@ -79,3 +102,5 @@ const renderReview = (review) => {
 
 
 
+// function calls
+getTastes()
