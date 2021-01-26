@@ -17,9 +17,24 @@ const getAndRenderCocktails = () => {
 
 getAndRenderCocktails();
 
+// categories
+const getTastes = () => {
+  fetch("http://localhost:3000/cocktails")
+  .then(res => res.json())
+  .then(showSideBar)
+}
 // ******************* Events Listeners *****************
 
 // ******************* Dom Manipulation / functions *****************
+
+const showSideBar= (categoriesArray) => {
+  categoriesArray.forEach(category =>{
+    verticalMenuDiv.innerHTML += `
+      <a class="item active">${category.name}</a>
+    `
+  })
+}
+
 const renderCocktail = (cocktail) => {
   const nameHeading = document.createElement("h2");
   const image = document.createElement("img");
@@ -62,20 +77,5 @@ const renderReview = (review) => {
   cocktailCardDiv.append(ratingDiv, reviewDiv);
 };
 
-const getTastes = () => {
-  fetch("http://localhost:3000/cocktails")
-  .then(res => res.json())
-  .then(showSideBar)
-}
-// ******************* Events Listeners *****************
-
-// ******************* Dom Manipulation / functions *****************
 
 
-const showSideBar= (categoriesArray) => {
-  categoriesArray.forEach(category =>{
-    verticalMenuDiv.innerHTML += `
-      <a class="item active">${category.name}</a>
-    `
-  })
-}
