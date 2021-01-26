@@ -23,6 +23,8 @@ const getTastes = () => {
   .then(res => res.json())
   .then(categoriesArray => showSideBar(categoriesArray))
 }
+
+getTastes(); 
 // ******************* Events Listeners *****************
 
 // ******************* Dom Manipulation / functions *****************
@@ -53,12 +55,9 @@ const renderCocktail = (cocktail) => {
       ${cocktail.reviews.map((review) => renderReview(review))}
     </div>
   </div>
-  <div class="extra content">
-    <a>
-      <i class="user icon"></i>
-      Average Rating: ${calculateAverage(cocktail)}
-    </a>
-  </div>
+  ${renderSeeReviewsButton(cocktail)}
+  <br>
+  ${renderAddReviewButton()}
 </div>
 `  
 };
@@ -90,7 +89,20 @@ const renderReview = (review) => {
   `
 };
 
+const renderSeeReviewsButton = (cocktail) => {
+ return `<div class="ui labeled button" tabindex="0">
+  <div class="ui button">
+    See Reviews
+  </div>
+  <a class="ui basic label">
+  Average Rating: ${calculateAverage(cocktail)}
+  </a>
+</div>
+`
+}; 
 
-
-// function calls
-getTastes()
+const renderAddReviewButton = () => {
+return `
+<button class="ui button">Add Review</button>
+`
+}
