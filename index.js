@@ -2,7 +2,9 @@
 
 const cocktailCardDiv = document.querySelector(".cocktail-cards");
 
-const verticalMenuDiv = Array.from(document.getElementsByClassName("ui vertical fluid tabular menu"))[0];
+const verticalMenuDiv = Array.from(
+  document.getElementsByClassName("ui vertical fluid tabular menu")
+)[0];
 const allDiv = document.querySelector("#All");
 
 // ******************* Network Requests *****************
@@ -18,54 +20,51 @@ const getTastes = () => {
     .then((res) => res.json())
     .then((categoriesArray) => {
       categories = categoriesArray;
-      showSideBar(categoriesArray)
+      showSideBar(categoriesArray);
     });
 };
 
 getTastes();
 
-
-
 // ******************* Dom Manipulation / functions *****************
 
 const showSideBar = (categoriesArray) => {
-
-  categoriesArray.forEach(category =>{
+  categoriesArray.forEach((category) => {
     // console.log(category.cocktails)
     verticalMenuDiv.innerHTML += `
       <a class="item" id=${category.id}>${category.name}</a>
-    `
-  })
-}
+    `;
+  });
+};
 
 function filterCocktails(e) {
   let categoryId = e.target.id;
   // console.log("categoryId", categoryId);
-  let relevantCategory = categories.find(category => parseInt(category.id) === parseInt(categoryId));
+  let relevantCategory = categories.find(
+    (category) => parseInt(category.id) === parseInt(categoryId)
+  );
   let categoryCocktails = relevantCategory.cocktails;
 
-  Array.from(verticalMenuDiv.children).forEach(child => {
-    child.className = "item"
-  })
+  Array.from(verticalMenuDiv.children).forEach((child) => {
+    child.className = "item";
+  });
 
-  e.target.className = "item active"
+  e.target.className = "item active";
   // Clear cocktailCardDiv so it's fresh / empty
   cocktailCardDiv.innerHTML = "";
 
   // Populate cocktailCardDiv with all of the categoryCocktails
 
   // console.log("categoryCocktails", categoryCocktails);
-  categoryCocktails.forEach(cocktail => {
-    renderCocktail(cocktail)
-  })
-
+  categoryCocktails.forEach((cocktail) => {
+    renderCocktail(cocktail);
+  });
 }
-function showAll(e){
-  if (e.target.id === "show-all-btn"){
-    getAndRenderCocktails()
-  } 
+function showAll(e) {
+  if (e.target.id === "show-all-btn") {
+    getAndRenderCocktails();
+  }
 }
-
 
 const renderCocktail = (cocktail) => {
   cocktailCardDiv.innerHTML += `
@@ -128,9 +127,9 @@ const handleSeeReviewsEvent = (cocktail) => {
   const reviewsDiv = document.querySelector(`#reviews-${cocktail.id}`);
   seeReviewsButton.addEventListener("click", (event) => {
     reviewsDiv.innerHTML = "";
-    reviewsDiv.innerHTML += `${cocktail.reviews.map((review) =>
-      renderReview(review)
-    )}`;
+    reviewsDiv.innerHTML += `${cocktail.reviews
+      .map((review) =>renderReview(review))
+      .join("<br>")}`;
   });
 };
 
@@ -166,9 +165,12 @@ const renderAddReviewButton = (cocktail) => {
 };
 
 const renderNewReviewForm = (event) => {
+  const cocktailId = `${event.target.dataset.id}`
   const reviewForm = document.querySelector(
-    `#reviews-form-${event.target.dataset.id}`
+    `#reviews-form-${cocktailId}`
   );
+  
+
   reviewForm.innerHTML += `
   <div class="ui form">
   <div class="inline fields">
@@ -207,22 +209,27 @@ const renderNewReviewForm = (event) => {
     <label>Review</label>
     <textarea rows="2" name="review"></textarea>
   </div>
-  <button class="mini ui button" type="submit">
+  <button class="mini ui button" type="submit" >
   Submit
   </button>
- 
   `;
+  $(".ui.radio.checkbox").checkbox();
 
   reviewForm.addEventListener("submit", (event) => {
     event.preventDefault();
-
-    const ratingInput = event.target.rating.value;
-    const reviewInput = event.target.review.value;
-    const review = {
-      rating: ratingInput,
-      review_text: reviewInput,
-    };
-    postNewReviewForm(review)
+      console.log('event.target', event.target)
+      const ratingInput = parseInt(event.target.rating.value);
+      const reviewInput = event.target.review.value;
+      const cocktailIdInput = parseInt(cocktailId);
+      
+      const review = {
+        user_id: 1,
+        cocktail_id: cocktailIdInput,
+        rating: ratingInput,
+        review_text: reviewInput,
+      };
+      console.log(review)
+      postNewReviewForm(review)
   });
 };
 
@@ -238,11 +245,9 @@ const postNewReviewForm = (newReview) => {
     .then((reviewData) => renderReview(reviewData));
 };
 //reviews are not yet rendering or persisting
-//need user_id and cocktail_id to create a review, where to find them? 
-//radio rating buttons can't be changed
+//need user_id and cocktail_id to create a review, where to find them?
 
 // ******************* Events Listeners *****************
 
-verticalMenuDiv.addEventListener('click', filterCocktails)
-document.addEventListener('click', showAll)
-
+verticalMenuDiv.addEventListener("click", filterCocktails);
+document.addEventListener("click", showAll);
