@@ -9,26 +9,59 @@ const getCocktails = () => {
   );
 };
 
+let categories = [];
+const getTastes = () => {
+  fetch("http://localhost:3000/categories/")
+    .then((res) => res.json())
+    .then((categoriesArray) => {
+      categories = categoriesArray;
+      showSideBar(categoriesArray)
+    });
+};
+
+getTastes();
+
+
 // ******************* Events Listeners *****************
 
+verticalMenuDiv.addEventListener('click', filterCocktails)
 // ******************* Dom Manipulation / functions *****************
 
 const showSideBar = (categoriesArray) => {
+
   categoriesArray.forEach(category =>{
-    console.log(verticalMenuDiv)
+    // console.log(category.cocktails)
     verticalMenuDiv.innerHTML += `
-      <a class="item">${category.name}</a>
+      <a class="item" id=${category.id}>${category.name}</a>
     `
   })
 }
 
-const getTastes = () => {
-  fetch("http://localhost:3000/categories")
-    .then((res) => res.json())
-    .then((categoriesArray) => showSideBar(categoriesArray));
-};
+function filterCocktails(e) {
+  let categoryId = e.target.id;
+  // console.log("categoryId", categoryId);
+  let relevantCategory = categories.find(category => parseInt(category.id) === parseInt(categoryId));
+  let categoryCocktails = relevantCategory.cocktails;
 
-getTastes();
+  Array.from(verticalMenuDiv.children).forEach(child => {
+    child.className = "item"
+  })
+  
+  e.target.className = "item active"
+  // Clear cocktailCardDiv so it's fresh / empty
+  cocktailCardDiv.innerHTML = "";
+
+  // Populate cocktailCardDiv with all of the categoryCocktails
+
+  // console.log("categoryCocktails", categoryCocktails);
+  categoryCocktails.forEach(cocktail => {
+    renderCocktail(cocktail)
+  })
+
+}
+
+
+
 
 const renderCocktail = (cocktail) => {
   cocktailCardDiv.innerHTML += `
