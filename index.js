@@ -1,9 +1,10 @@
 // ******************* Dom Elements *****************
 
 const cocktailCardDiv = document.querySelector(".cocktail-cards");
-const verticalMenuDiv = Array.from(
-  document.getElementsByClassName("ui vertical fluid tabular menu")
-)[0];
+
+const verticalMenuDiv = Array.from(document.getElementsByClassName("ui vertical fluid tabular menu"))[0];
+const allDiv = document.querySelector("#All");
+
 // ******************* Network Requests *****************
 const getCocktails = () => {
   return fetch("http://localhost:3000/cocktails").then((response) =>
@@ -11,25 +12,60 @@ const getCocktails = () => {
   );
 };
 
-// ******************* Events Listeners *****************
+let categories = [];
+const getTastes = () => {
+  fetch("http://localhost:3000/categories/")
+    .then((res) => res.json())
+    .then((categoriesArray) => {
+      categories = categoriesArray;
+      showSideBar(categoriesArray)
+    });
+};
+
+getTastes();
+
+
 
 // ******************* Dom Manipulation / functions *****************
 
 const showSideBar = (categoriesArray) => {
-  categoriesArray.forEach((category) => {
+
+  categoriesArray.forEach(category =>{
+    // console.log(category.cocktails)
     verticalMenuDiv.innerHTML += `
-      <a class="item">${category.name}</a>
-    `;
-  });
-};
+      <a class="item" id=${category.id}>${category.name}</a>
+    `
+  })
+}
 
-const getTastes = () => {
-  fetch("http://localhost:3000/categories")
-    .then((res) => res.json())
-    .then((categoriesArray) => showSideBar(categoriesArray));
-};
+function filterCocktails(e) {
+  let categoryId = e.target.id;
+  // console.log("categoryId", categoryId);
+  let relevantCategory = categories.find(category => parseInt(category.id) === parseInt(categoryId));
+  let categoryCocktails = relevantCategory.cocktails;
 
-getTastes();
+  Array.from(verticalMenuDiv.children).forEach(child => {
+    child.className = "item"
+  })
+
+  e.target.className = "item active"
+  // Clear cocktailCardDiv so it's fresh / empty
+  cocktailCardDiv.innerHTML = "";
+
+  // Populate cocktailCardDiv with all of the categoryCocktails
+
+  // console.log("categoryCocktails", categoryCocktails);
+  categoryCocktails.forEach(cocktail => {
+    renderCocktail(cocktail)
+  })
+
+}
+function showAll(e){
+  if (e.target.id === "show-all-btn"){
+    getAndRenderCocktails()
+  } 
+}
+
 
 const renderCocktail = (cocktail) => {
   cocktailCardDiv.innerHTML += `
@@ -205,5 +241,8 @@ const postNewReviewForm = (newReview) => {
 //need user_id and cocktail_id to create a review, where to find them? 
 //radio rating buttons can't be changed
 
+// ******************* Events Listeners *****************
 
+verticalMenuDiv.addEventListener('click', filterCocktails)
+document.addEventListener('click', showAll)
 
