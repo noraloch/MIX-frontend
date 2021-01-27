@@ -1,7 +1,9 @@
 // ******************* Dom Elements *****************
 
 const cocktailCardDiv = document.querySelector(".cocktail-cards");
-const verticalMenuDiv = Array.from(document.getElementsByClassName("ui vertical fluid tabular menu"))[0]
+const verticalMenuDiv = Array.from(
+  document.getElementsByClassName("ui vertical fluid tabular menu")
+)[0];
 // ******************* Network Requests *****************
 const getCocktails = () => {
   return fetch("http://localhost:3000/cocktails").then((response) =>
@@ -14,13 +16,12 @@ const getCocktails = () => {
 // ******************* Dom Manipulation / functions *****************
 
 const showSideBar = (categoriesArray) => {
-  categoriesArray.forEach(category =>{
-    console.log(verticalMenuDiv)
+  categoriesArray.forEach((category) => {
     verticalMenuDiv.innerHTML += `
       <a class="item">${category.name}</a>
-    `
-  })
-}
+    `;
+  });
+};
 
 const getTastes = () => {
   fetch("http://localhost:3000/categories")
@@ -32,7 +33,7 @@ getTastes();
 
 const renderCocktail = (cocktail) => {
   cocktailCardDiv.innerHTML += `
-  <div class="ui card">
+  <div class="ui card five wide column">
   <div class="image">
     <img src=${cocktail.image}>
   </div>
@@ -42,18 +43,20 @@ const renderCocktail = (cocktail) => {
       <span class="date">${cocktail.recipe}</span>
     </div>
     <div class="description" id=reviews-${cocktail.id}>
-      
     </div>
+    <form class="review-form" id=reviews-form-${cocktail.id}>
+    </form>
   </div>
   ${renderSeeReviewsButton(cocktail)}
   <br>
-  ${renderAddReviewButton()}
+  ${renderAddReviewButton(cocktail)}
 </div>
 `;
 
   setTimeout(() => {
     handleSeeReviewsEvent(cocktail);
-  }, 1);
+    handleAddReviewEvent(cocktail);
+  });
 };
 
 const getAndRenderCocktails = () => {
@@ -88,11 +91,17 @@ const handleSeeReviewsEvent = (cocktail) => {
   const seeReviewsButton = document.querySelector(`#cocktail-${cocktail.id}`);
   const reviewsDiv = document.querySelector(`#reviews-${cocktail.id}`);
   seeReviewsButton.addEventListener("click", (event) => {
-    reviewsDiv.innerHTML = ""
+    reviewsDiv.innerHTML = "";
     reviewsDiv.innerHTML += `${cocktail.reviews.map((review) =>
       renderReview(review)
     )}`;
   });
+};
+
+const handleAddReviewEvent = (cocktail) => {
+  const addReviewButton = document.querySelector(`#add-review-${cocktail.id}`);
+  addReviewButton.dataset.id = cocktail.id;
+  addReviewButton.addEventListener("click", renderNewReviewForm);
 };
 
 const renderReview = (review) => {
@@ -114,9 +123,87 @@ const renderSeeReviewsButton = (cocktail) => {
 `;
 };
 
-const renderAddReviewButton = () => {
+const renderAddReviewButton = (cocktail) => {
   return `
-<button class="ui button">Add Review</button>
+<button class="ui button" id="add-review-${cocktail.id}">Add Review</button>
 `;
 };
+
+const renderNewReviewForm = (event) => {
+  const reviewForm = document.querySelector(
+    `#reviews-form-${event.target.dataset.id}`
+  );
+  reviewForm.innerHTML += `
+  <div class="ui form">
+  <div class="inline fields">
+    <div class="field">
+      <div class="ui radio checkbox">
+        <input type="radio" name="rating" checked="" tabindex="0" class="hidden" value="1">
+        <label>1</label>
+      </div>
+    </div>
+    <div class="field">
+      <div class="ui radio checkbox">
+        <input type="radio" name="rating" tabindex="0" class="hidden" value="2">
+        <label>2</label>
+      </div>
+    </div>
+    <div class="field">
+      <div class="ui radio checkbox">
+        <input type="radio" name="rating" tabindex="0" class="hidden" value="3">
+        <label>3</label>
+      </div>
+    </div>
+    <div class="field">
+      <div class="ui radio checkbox">
+        <input type="radio" name="rating" tabindex="0" class="hidden" value="4">
+        <label>4</label>
+      </div>
+    </div>
+    <div class="field">
+      <div class="ui radio checkbox">
+        <input type="radio" name="rating" tabindex="0" class="hidden" value="5">
+        <label>5</label>
+    </div>
+  </div>
+  </div>
+  <div class="field">
+    <label>Review</label>
+    <textarea rows="2" name="review"></textarea>
+  </div>
+  <button class="mini ui button" type="submit">
+  Submit
+  </button>
+ 
+  `;
+
+  reviewForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    const ratingInput = event.target.rating.value;
+    const reviewInput = event.target.review.value;
+    const review = {
+      rating: ratingInput,
+      review_text: reviewInput,
+    };
+    postNewReviewForm(review)
+  });
+};
+
+const postNewReviewForm = (newReview) => {
+  return fetch("http://localhost:3000/reviews", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(newReview),
+  })
+    .then((response) => response.json())
+    .then((reviewData) => renderReview(reviewData));
+};
+//reviews are not yet rendering or persisting
+//need user_id and cocktail_id to create a review, where to find them? 
+//radio rating buttons can't be changed
+
+
 
