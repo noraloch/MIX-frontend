@@ -2,6 +2,7 @@
 
 const cocktailCardDiv = document.querySelector(".cocktail-cards");
 const verticalMenuDiv = Array.from(document.getElementsByClassName("ui vertical fluid tabular menu"))[0];
+const allDiv = document.querySelector("#All");
 // ******************* Network Requests *****************
 const getCocktails = () => {
   return fetch("http://localhost:3000/cocktails").then((response) =>
@@ -66,7 +67,7 @@ function showAll(e){
 
 const renderCocktail = (cocktail) => {
   cocktailCardDiv.innerHTML += `
-  <div class="ui card">
+  <div class="ui card five wide column">
   <div class="image">
     <img src=${cocktail.image}>
   </div>
