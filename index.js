@@ -128,7 +128,7 @@ const handleSeeReviewsEvent = (cocktail) => {
   seeReviewsButton.addEventListener("click", (event) => {
     reviewsDiv.innerHTML = "";
     reviewsDiv.innerHTML += `${cocktail.reviews
-      .map((review) =>renderReview(review))
+      .map((review) => renderReview(review))
       .join("<br>")}`;
   });
 };
@@ -143,7 +143,13 @@ const renderReview = (review) => {
   return `
     <div class="rating">${review.rating}</div>
     <div class="review">${review.review_text}</div>
+    <button class="update-review-button" id="update-review-${review.cocktail_id}">
+    Update Review
+    </button>
   `;
+  // const updateReviewButton = document.querySelector(`#update-review-${review.cocktail_id}`);
+  // updateReviewButton.dataset.id = review.cocktail_id;
+  // updateReviewButton.addEventListener("click", renderUpdateReviewForm);
 };
 
 const renderSeeReviewsButton = (cocktail) => {
@@ -165,11 +171,8 @@ const renderAddReviewButton = (cocktail) => {
 };
 
 const renderNewReviewForm = (event) => {
-  const cocktailId = `${event.target.dataset.id}`
-  const reviewForm = document.querySelector(
-    `#reviews-form-${cocktailId}`
-  );
-  
+  const cocktailId = `${event.target.dataset.id}`;
+  const reviewForm = document.querySelector(`#reviews-form-${cocktailId}`);
 
   reviewForm.innerHTML += `
   <div class="ui form">
@@ -217,19 +220,17 @@ const renderNewReviewForm = (event) => {
 
   reviewForm.addEventListener("submit", (event) => {
     event.preventDefault();
-      console.log('event.target', event.target)
-      const ratingInput = parseInt(event.target.rating.value);
-      const reviewInput = event.target.review.value;
-      const cocktailIdInput = parseInt(cocktailId);
-      
-      const review = {
-        user_id: 1,
-        cocktail_id: cocktailIdInput,
-        rating: ratingInput,
-        review_text: reviewInput,
-      };
-      console.log(review)
-      postNewReviewForm(review)
+    const ratingInput = parseInt(event.target.rating.value);
+    const reviewInput = event.target.review.value;
+    const cocktailIdInput = parseInt(cocktailId);
+
+    const review = {
+      user_id: 1,
+      cocktail_id: cocktailIdInput,
+      rating: ratingInput,
+      review_text: reviewInput,
+    };
+    postNewReviewForm(review);
   });
 };
 
@@ -242,10 +243,23 @@ const postNewReviewForm = (newReview) => {
     body: JSON.stringify(newReview),
   })
     .then((response) => response.json())
-    .then((reviewData) => renderReview(reviewData));
+    .then((reviewData) => {
+      const reviewsDiv = document.querySelector(
+        `#reviews-${newReview.cocktail_id}`
+      );
+      reviewsDiv.innerHTML += renderReview(reviewData);
+    });
 };
-//reviews are not yet rendering or persisting
-//need user_id and cocktail_id to create a review, where to find them?
+
+// const updateReview = (updatedReview) => {
+//   return fetch(`http://localhost:3000/reviews/${updatedReview.id}`, {
+//     method: "PATCH",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify({rating: updatedReview.rating, review: updatedReview.review}),
+//   }).then((response) => response.json());
+// };
 
 // ******************* Events Listeners *****************
 
