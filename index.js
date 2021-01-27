@@ -1,7 +1,7 @@
 // ******************* Dom Elements *****************
 
 const cocktailCardDiv = document.querySelector(".cocktail-cards");
-const verticalMenuDiv = Array.from(document.getElementsByClassName("ui vertical fluid tabular menu"))[0]
+const verticalMenuDiv = Array.from(document.getElementsByClassName("ui vertical fluid tabular menu"))[0];
 // ******************* Network Requests *****************
 const getCocktails = () => {
   return fetch("http://localhost:3000/cocktails").then((response) =>
@@ -22,9 +22,7 @@ const getTastes = () => {
 getTastes();
 
 
-// ******************* Events Listeners *****************
 
-verticalMenuDiv.addEventListener('click', filterCocktails)
 // ******************* Dom Manipulation / functions *****************
 
 const showSideBar = (categoriesArray) => {
@@ -46,7 +44,7 @@ function filterCocktails(e) {
   Array.from(verticalMenuDiv.children).forEach(child => {
     child.className = "item"
   })
-  
+
   e.target.className = "item active"
   // Clear cocktailCardDiv so it's fresh / empty
   cocktailCardDiv.innerHTML = "";
@@ -59,8 +57,11 @@ function filterCocktails(e) {
   })
 
 }
-
-
+function showAll(e){
+  if (e.target.id === "show-all-btn"){
+    getAndRenderCocktails()
+  } 
+}
 
 
 const renderCocktail = (cocktail) => {
@@ -153,3 +154,7 @@ const renderAddReviewButton = () => {
 `;
 };
 
+// ******************* Events Listeners *****************
+
+verticalMenuDiv.addEventListener('click', filterCocktails)
+document.addEventListener('click', showAll)
