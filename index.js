@@ -75,7 +75,6 @@ const login = (e) => {
 
 const showSideBar = (categoriesArray) => {
   categoriesArray.forEach((category) => {
-    // console.log(category.cocktails)
     verticalMenuDiv.innerHTML += `
       <a class="item" id=${category.id}>${category.name}</a>
     `;
@@ -84,7 +83,6 @@ const showSideBar = (categoriesArray) => {
 
 function filterCocktails(e) {
   let categoryId = e.target.id;
-  // console.log("categoryId", categoryId);
   let relevantCategory = categories.find(
     (category) => parseInt(category.id) === parseInt(categoryId)
   );
@@ -126,14 +124,13 @@ const renderCocktail = (cocktail) => {
     <form class="review-form" id=reviews-form-${cocktail.id}>
     </form>
   </div>
-  ${renderSeeReviewsButton(cocktail)}
+  ${cocktail.reviews.length === 0 ? "" : renderSeeReviewsButton(cocktail)}
   <br>
   ${loggedInData.loggedIn ? renderAddReviewButton(cocktail): ""}
 </div>
 `;
-
   setTimeout(() => {
-    handleSeeReviewsEvent(cocktail);
+    cocktail.reviews.length > 0 ? handleSeeReviewsEvent(cocktail): undefined;
     loggedInData.loggedIn ? handleAddReviewEvent(cocktail): undefined;
   });
 };
@@ -180,8 +177,10 @@ const handleSeeReviewsEvent = (cocktail) => {
     const reviewsArray = cocktail.reviews;
     reviewsArray.forEach((review) => {
       const updateReviewButton = document.querySelector(`#update-review-${review.id}`);
+      if (updateReviewButton) {
       updateReviewButton.dataset.id = review.id;
       updateReviewButton.addEventListener("click", renderUpdateReviewForm);
+      }
     });
   });
 };
@@ -192,14 +191,18 @@ const handleAddReviewEvent = (cocktail) => {
   addReviewButton.addEventListener("click", renderNewReviewForm);
 };
 
+const renderUpdateButton = (review) => {
+  return `<button class="update-review-button" id="update-review-${review.id}">
+  Update Review
+  </button>`
+}
+
 const renderReview = (review) => {
   return `
   <div id="review-${review.id}">
     <div class="rating">${review.rating}</div>
     <div class="review">${review.review_text}</div>
-    <button class="update-review-button" id="update-review-${review.id}">
-    Update Review
-    </button>
+    ${loggedInData.loggedInId === review.user_id ? renderUpdateButton(review) : ""} 
   </div>
   `;
 };
@@ -225,7 +228,6 @@ const renderAddReviewButton = (cocktail) => {
 const renderNewReviewForm = (event) => {
   const cocktailId = `${event.target.dataset.id}`;
   const reviewForm = document.querySelector(`#reviews-form-${cocktailId}`);
-
   reviewForm.innerHTML += `
   <div class="ui form">
   <div class="inline fields">
@@ -277,11 +279,12 @@ const renderNewReviewForm = (event) => {
     const cocktailIdInput = parseInt(cocktailId);
 
     const review = {
-      user_id: 1,
+      user_id: loggedInData.loggedInId,
       cocktail_id: cocktailIdInput,
       rating: ratingInput,
       review_text: reviewInput,
     };
+    reviewForm.innerHTML = ""
     postNewReviewForm(review);
   });
 };
@@ -414,7 +417,7 @@ function loggedInView(name){
       loggedInUsername: name,
       loggedInId: usernameId
     }
-    // console.log(loggedInData)
+
     getAndRenderCocktails();
     let logoutBtn = menuArea.querySelector('a');
     logoutBtn.addEventListener('click', landingView); 
@@ -506,16 +509,21 @@ verticalMenuDiv.addEventListener("click", filterCocktails);
 document.addEventListener("click", showAll);
 
 
-//user ids need to be dynamic
 //prepopulate update review form
-//update or new forms should disappear/clear? after you submit
-//validations for updating and adding a new review, first pass coud be hiding update and add buttons if not logged in
-//averages don't seem to be updated until after reload
+//seeding
+//X if no reviews for cocktail don't show average
+//X new forms should disappear/clear? after you submit
+//X user_id is dynamic
+//X only show update review button for reviews user wrote
+//data is stale when you click see reviews after adding/updating, have to reload, state issue
+//averages aren't updated until after reload, same issue as above, stale data
 
 //styling
 //align review buttons at bottom of cards
 //star rating
 //flip cards
+//background
+
 
 verticalMenuDiv.addEventListener('click', filterCocktails);
 document.addEventListener('click', showAll);
