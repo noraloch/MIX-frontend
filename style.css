@@ -1,0 +1,28 @@
+/* 
+body {
+    background-image: url('img/leaf.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+} */
+
+body {
+    /* width: 200px; */
+    /* height: 200px; */
+    /* display: block; */
+    position: relative;
+  }
+  body::after {
+    content: "";
+    background: url('img/leaf.jpg');
+    opacity: 0.5;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    z-index: -1;
+  }
+  #back {
+    /* position: relative; */
+    background-image: url('img/leaf.jpg');
+  }

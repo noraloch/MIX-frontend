@@ -106,24 +106,38 @@ function showAll(e) {
   if (e.target.id === "show-all-btn") {
     getAndRenderCocktails();
   }
+
 }
+
+{/* <div class="ui card five wide column">
+<div class="image">
+  <img src=${cocktail.image}>
+</div>
+<div class="content">
+  <a class="header">${cocktail.name}</a>
+  <div class="meta">
+    <span class="date">${cocktail.recipe}</span>
+  </div>
+  <div class="description" id=reviews-${cocktail.id}>
+  </div>
+  <form class="review-form" id=reviews-form-${cocktail.id}>
+  </form>
+</div> */}
 
 const renderCocktail = (cocktail) => {
   cocktailCardDiv.innerHTML += `
-  <div class="ui card five wide column">
-  <div class="image">
-    <img src=${cocktail.image}>
+  <div class="ui card">
+  <div class="ui slide masked reveal image">
+    <img src=${cocktail.image} class="visible content">
+    <p class="meta hidden content">${cocktail.recipe}</p>
   </div>
   <div class="content">
     <a class="header">${cocktail.name}</a>
-    <div class="meta">
-      <span class="date">${cocktail.recipe}</span>
-    </div>
-    <div class="description" id=reviews-${cocktail.id}>
-    </div>
-    <form class="review-form" id=reviews-form-${cocktail.id}>
-    </form>
   </div>
+  <div class="description" id=reviews-${cocktail.id}>
+  </div>
+  <form class="review-form" id=reviews-form-${cocktail.id}>
+  </form>
   ${cocktail.reviews.length === 0 ? "" : renderSeeReviewsButton(cocktail)}
   <br>
   ${loggedInData.loggedIn ? renderAddReviewButton(cocktail): ""}
@@ -134,6 +148,10 @@ const renderCocktail = (cocktail) => {
     loggedInData.loggedIn ? handleAddReviewEvent(cocktail): undefined;
   });
 };
+
+// <div class="meta">
+// <span class="date">Created in Sep 2014</span>
+// </div>
 
 const getAndRenderCocktails = () => {
   cocktailCardDiv.innerHTML = "";
