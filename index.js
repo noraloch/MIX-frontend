@@ -358,8 +358,9 @@ document.addEventListener("click", showAll);
 
 //user ids need to be dynamic
 //prepopulate update review form
-//update or new forms should disappear after you submit
+//update or new forms should disappear/clear? after you submit
 //validations for updating and adding a new review, first pass coud be hiding update and add buttons if not logged in
+//averages don't seem to be updated until after reload
 
 //styling
 //align review buttons at bottom of cards
