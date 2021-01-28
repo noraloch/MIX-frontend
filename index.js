@@ -2,10 +2,11 @@
 
 const cocktailCardDiv = document.querySelector(".cocktail-cards");
 
-const verticalMenuDiv = Array.from(
-  document.getElementsByClassName("ui vertical fluid tabular menu")
-)[0];
+const verticalMenuDiv = Array.from(document.getElementsByClassName("ui vertical fluid tabular menu"))[0];
 const allDiv = document.querySelector("#All");
+let loginForm = document.querySelector("#login-form");
+let lIMenu = document.querySelector("#lIMenu");
+let signUpBtn = document.querySelector("#signup")
 
 // ******************* Network Requests *****************
 const getCocktails = () => {
@@ -25,8 +26,27 @@ const getTastes = () => {
 };
 
 getTastes();
+let usernameId;
+function usernameFetch(input){
+ return fetch(`http://localhost:3000/users/${input}`)
+  .then(res => res.json())
+  .then(object=>{
+      if (object === null || input === ""){
+        return landingView()
+      }else{
+        usernameId = object.id
+        return loggedInView(input)
+      }
+  })
+}
 
 // ******************* Dom Manipulation / functions *****************
+
+const login = (e) => {
+  e.preventDefault();
+  const usernameInput = e.target.username.value;
+  usernameFetch(usernameInput)
+};
 
 const showSideBar = (categoriesArray) => {
   categoriesArray.forEach((category) => {
@@ -54,11 +74,10 @@ function filterCocktails(e) {
   cocktailCardDiv.innerHTML = "";
 
   // Populate cocktailCardDiv with all of the categoryCocktails
-
-  // console.log("categoryCocktails", categoryCocktails);
-  categoryCocktails.forEach((cocktail) => {
+  categoryCocktails.forEach(cocktail => {
     renderCocktail(cocktail);
   });
+
 }
 function showAll(e) {
   if (e.target.id === "show-all-btn") {
@@ -84,17 +103,18 @@ const renderCocktail = (cocktail) => {
   </div>
   ${renderSeeReviewsButton(cocktail)}
   <br>
-  ${renderAddReviewButton(cocktail)}
+  ${loggedInData.loggedIn ? renderAddReviewButton(cocktail): ""}
 </div>
 `;
 
   setTimeout(() => {
     handleSeeReviewsEvent(cocktail);
-    handleAddReviewEvent(cocktail);
+    loggedInData.loggedIn ? handleAddReviewEvent(cocktail): undefined;
   });
 };
 
 const getAndRenderCocktails = () => {
+  cocktailCardDiv.innerHTML = "";
   getCocktails().then((cocktailData) => {
     cocktailData.forEach((cocktail) => renderCocktail(cocktail));
   });
@@ -350,8 +370,62 @@ const updateReview = (updatedReview) => {
   });
 };
 
-// ******************* Events Listeners *****************
+let loggedInData = {
+  loggedIn: false,
+  loggedInUsername: undefined,
+  loggedInId: undefined
+};
 
+function loggedInView(name){
+  lIMenu.innerHTML = "";
+  signUpBtn.innerHTML = `
+    <a class="item">Logout</a>  
+    <class = "inline field"><h5 class="ui yellow inverted header">Hello ${name}!</h5>
+    ` 
+    loggedInData = {
+      loggedIn: true,
+      loggedInUsername: name,
+      loggedInId: usernameId
+    }
+    console.log(loggedInData)
+    getAndRenderCocktails();
+    let logoutBtn = signUpBtn.querySelector('a');
+    logoutBtn.addEventListener('click', landingView); 
+};
+
+  function landingView(){
+  // console.log("not a user");
+    loggedInData = {
+      loggedIn: false,
+      loggedInUsername: undefined,
+      loggedInId: undefined
+    }
+    getAndRenderCocktails();
+
+  lIMenu.innerHTML = `
+    <form id="login-form">
+    <div class="ui form">
+      <div class="inline field">
+        <br>
+        <input type="text" name="username" placeholder="Username">
+        <button class="ui button" type="submit">Login</button>
+      </div>
+    </div>
+    </form>
+  `
+  signUpBtn.innerHTML = `
+  <br>
+  <button class="ui animated button" tabindex="0">
+    <div class="visible content">Sign-up</div>
+    <div class="hidden content">
+      <i class="right arrow icon"></i>
+    </div>
+  </button>
+  </div>
+  ` 
+
+  };
+// ******************* Events Listeners *****************
 verticalMenuDiv.addEventListener("click", filterCocktails);
 document.addEventListener("click", showAll);
 
@@ -366,3 +440,7 @@ document.addEventListener("click", showAll);
 //align review buttons at bottom of cards
 //star rating
 //flip cards
+
+verticalMenuDiv.addEventListener('click', filterCocktails);
+document.addEventListener('click', showAll);
+loginForm.addEventListener('submit', login);

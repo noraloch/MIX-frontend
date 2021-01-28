@@ -9,46 +9,43 @@
     </head>
 
     <body>
-      <br>
-      <br>
+      <div id="All">
       <div class="ui fixed inverted main menu">
         <div class="ui container">
-          <div>
-          <h1 class="ui grey inverted header">MIX</h1>
-          </div>
-          <div class="right menu">
+            <br><h1 class="ui grey inverted header">MIX</h1>
+          <div class="right menu" id="lIMenu">
+            <form id="login-form">
             <div class="ui form">
               <div class="inline field">
-                <label>Username</label>
-                <input type="text" placeholder="Username">
-                <button class="ui button" type="submit">Submit</button>
+                <br>
+                <input type="text" name="username" placeholder="Username">
+                <button class="ui button" type="submit">Login</button>
               </div>
             </div>
+            </form>
           </div>
+          <div class="right menu">
+            <div class="inline field" id="signup">
+            <br>
+            <button class="ui animated button" tabindex="0">
+              <div class="visible content">Sign-up</div>
+              <div class="hidden content">
+                <i class="right arrow icon"></i>
+              </div>
+            </button>
+            </div>
+          </div> 
 
         </div>
       </div>
 
-      <!-- <div class="ui inverted segment">
-        <h1 class="ui grey inverted header">MIX</h1>
-      </div> -->
     <br>
     <br>
     <br>
 
-<!-- if signed in -->
-      <!-- <div class="ui form">
-        <div class="inline field">
-          <label>Username</label>
-          <input type="text" placeholder="Username">
-          <button class="ui button" type="submit">Submit</button>
-        </div>
-        
-      </div> -->
 
-<!-- if not -->
-      
-      <!-- <div class="ui inverted segment">
+<!--       
+      <div class="ui inverted segment">
         <div class="ui inverted form">
           <div class="two fields">
             <div class="field">
@@ -78,7 +75,6 @@
       </form> -->
 
     
-    <div id="All">
     <div class="ui grid">
         <div class="four wide column">
           <h3 class="ui center aligned header">Tastes</h3>
