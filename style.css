@@ -5,13 +5,13 @@ body {
     background-size: cover;
 } */
 
-body {
+  #full-image {
     /* width: 200px; */
     /* height: 200px; */
     /* display: block; */
     position: relative;
   }
-  body::after {
+  #full-image::after {
     content: "";
     background: url('img/leaf.jpg');
     opacity: 0.5;
