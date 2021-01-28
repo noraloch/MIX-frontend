@@ -26,7 +26,7 @@ const getTastes = () => {
 };
 
 getTastes();
-
+let usernameId;
 function usernameFetch(input){
  return fetch(`http://localhost:3000/users/${input}`)
   .then(res => res.json())
@@ -34,6 +34,7 @@ function usernameFetch(input){
       if (object === null || input === ""){
         return landingView()
       }else{
+        usernameId = object.id
         return loggedInView(input)
       }
   })
@@ -102,17 +103,18 @@ const renderCocktail = (cocktail) => {
   </div>
   ${renderSeeReviewsButton(cocktail)}
   <br>
-  ${renderAddReviewButton(cocktail)}
+  ${loggedInData.loggedIn ? renderAddReviewButton(cocktail): ""}
 </div>
 `;
 
   setTimeout(() => {
     handleSeeReviewsEvent(cocktail);
-    handleAddReviewEvent(cocktail);
+    loggedInData.loggedIn ? handleAddReviewEvent(cocktail): undefined;
   });
 };
 
 const getAndRenderCocktails = () => {
+  cocktailCardDiv.innerHTML = "";
   getCocktails().then((cocktailData) => {
     cocktailData.forEach((cocktail) => renderCocktail(cocktail));
   });
@@ -279,19 +281,59 @@ const postNewReviewForm = (newReview) => {
 //   }).then((response) => response.json());
 // };
 
+let loggedInData = {
+  loggedIn: false,
+  loggedInUsername: undefined,
+  loggedInId: undefined
+};
+
 function loggedInView(name){
   lIMenu.innerHTML = "";
   signUpBtn.innerHTML = `
     <a class="item">Logout</a>  
     <class = "inline field"><h5 class="ui yellow inverted header">Hello ${name}!</h5>
     ` 
+    loggedInData = {
+      loggedIn: true,
+      loggedInUsername: name,
+      loggedInId: usernameId
+    }
+    console.log(loggedInData)
+    getAndRenderCocktails();
     let logoutBtn = signUpBtn.querySelector('a');
     logoutBtn.addEventListener('click', landingView); 
 };
 
   function landingView(){
-  console.log("not a user")
-  // lIMenu.innerHTML
+  // console.log("not a user");
+    loggedInData = {
+      loggedIn: false,
+      loggedInUsername: undefined,
+      loggedInId: undefined
+    }
+    getAndRenderCocktails();
+
+  lIMenu.innerHTML = `
+    <form id="login-form">
+    <div class="ui form">
+      <div class="inline field">
+        <br>
+        <input type="text" name="username" placeholder="Username">
+        <button class="ui button" type="submit">Login</button>
+      </div>
+    </div>
+    </form>
+  `
+  signUpBtn.innerHTML = `
+  <br>
+  <button class="ui animated button" tabindex="0">
+    <div class="visible content">Sign-up</div>
+    <div class="hidden content">
+      <i class="right arrow icon"></i>
+    </div>
+  </button>
+  </div>
+  ` 
 
   };
 // ******************* Events Listeners *****************
@@ -299,3 +341,4 @@ function loggedInView(name){
 verticalMenuDiv.addEventListener('click', filterCocktails);
 document.addEventListener('click', showAll);
 loginForm.addEventListener('submit', login);
+
