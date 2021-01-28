@@ -3,10 +3,12 @@
 const cocktailCardDiv = document.querySelector(".cocktail-cards");
 
 const verticalMenuDiv = Array.from(document.getElementsByClassName("ui vertical fluid tabular menu"))[0];
-const allDiv = document.querySelector("#All");
 let loginForm = document.querySelector("#login-form");
 let lIMenu = document.querySelector("#lIMenu");
-let signUpBtn = document.querySelector("#signup")
+let menuArea = document.querySelector("#menu-area")
+let signUpBtn = menuArea.querySelector("button");
+const all = document.querySelector(".all");
+
 
 // ******************* Network Requests *****************
 const getCocktails = () => {
@@ -26,6 +28,8 @@ const getTastes = () => {
 };
 
 getTastes();
+
+
 let usernameId;
 function usernameFetch(input){
  return fetch(`http://localhost:3000/users/${input}`)
@@ -40,6 +44,27 @@ function usernameFetch(input){
   })
 }
 
+function postUserFetch(newUser){
+  fetch(`http://localhost:3000/users`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(newUser),
+  })
+    .then(res => res.json())
+    .then(newObj => {
+      newObj.id ? loggedInView(newObj.name) : renderSignUpForm(false) ; 
+    })
+}
+
+function deleteFetch(){
+  fetch(`http://localhost:3000/users/${loggedInData.loggedInUsername}`, {
+    method: "DELETE"
+  })
+  .then(res => res.json())
+  .then(landingView)
+}
 // ******************* Dom Manipulation / functions *****************
 
 const login = (e) => {
@@ -377,9 +402,11 @@ let loggedInData = {
 };
 
 function loggedInView(name){
+  // all.innerHTML = "";
   lIMenu.innerHTML = "";
-  signUpBtn.innerHTML = `
-    <a class="item">Logout</a>  
+  menuArea.innerHTML = `
+    <a class="item">Logout</a> 
+    <a class="item" id="delete">Delete Account</a> 
     <class = "inline field"><h5 class="ui yellow inverted header">Hello ${name}!</h5>
     ` 
     loggedInData = {
@@ -387,10 +414,13 @@ function loggedInView(name){
       loggedInUsername: name,
       loggedInId: usernameId
     }
-    console.log(loggedInData)
+    // console.log(loggedInData)
     getAndRenderCocktails();
-    let logoutBtn = signUpBtn.querySelector('a');
+    let logoutBtn = menuArea.querySelector('a');
     logoutBtn.addEventListener('click', landingView); 
+
+    let deleteAccounteBtn = menuArea.querySelector("#delete");
+    deleteAccounteBtn.addEventListener("click", deleteFetch)
 };
 
   function landingView(){
@@ -400,20 +430,24 @@ function loggedInView(name){
       loggedInUsername: undefined,
       loggedInId: undefined
     }
+    renderBarBack()
     getAndRenderCocktails();
+    
+  };
 
+function renderBarBack(){
   lIMenu.innerHTML = `
-    <form id="login-form">
-    <div class="ui form">
-      <div class="inline field">
-        <br>
-        <input type="text" name="username" placeholder="Username">
-        <button class="ui button" type="submit">Login</button>
-      </div>
+  <form id="login-form">
+  <div class="ui form">
+    <div class="inline field">
+      <br>
+      <input type="text" name="username" placeholder="Username">
+      <button class="ui button" type="submit">Login</button>
     </div>
-    </form>
-  `
-  signUpBtn.innerHTML = `
+  </div>
+  </form>
+`
+  menuArea.innerHTML = `
   <br>
   <button class="ui animated button" tabindex="0">
     <div class="visible content">Sign-up</div>
@@ -421,10 +455,52 @@ function loggedInView(name){
       <i class="right arrow icon"></i>
     </div>
   </button>
-  </div>
-  ` 
+` 
+let signUpBtn = menuArea.querySelector("button");
+signUpBtn.addEventListener('click', renderSignUpForm);
 
-  };
+}
+
+let signUpForm;
+function renderSignUpForm(result){
+    // e.preventDefault();
+    // menuArea.innerHTML = "";
+    // all.innerHTML = "";
+    cocktailCardDiv.innerHTML = ""
+    cocktailCardDiv.innerHTML =  `
+    <br><br><br><br>
+    <div class="ui inverted segment container">
+    <div class="ui inverted form">
+    <form> 
+      <div class="two fields">
+        <div class="field">
+          <label>Username</label>
+          <input type="text" name="username" placeholder="Please Enter a Valid Username">
+        </div>
+        <div class="field">
+        <label>Age</label>
+        <input type="number" name="age" min="21" max="120" required placeholder="Must Be >20">
+        </div>
+        <button class="ui button" type="submit">Submit</button>
+      </div>
+    </form> 
+    <span> ${result ? "" : "Invalid Username!"}</span>
+    </div>
+  </div>
+    `
+    signUpForm = all.querySelector("form");
+    
+    signUpForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      let userObj = {
+        name: e.target.username.value,
+        age: parseInt(e.target.age.value)
+      }
+      postUserFetch(userObj);
+    });
+
+  }
+
 // ******************* Events Listeners *****************
 verticalMenuDiv.addEventListener("click", filterCocktails);
 document.addEventListener("click", showAll);
@@ -444,3 +520,7 @@ document.addEventListener("click", showAll);
 verticalMenuDiv.addEventListener('click', filterCocktails);
 document.addEventListener('click', showAll);
 loginForm.addEventListener('submit', login);
+signUpBtn.addEventListener('click', renderSignUpForm);
+
+
+
