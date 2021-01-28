@@ -111,7 +111,7 @@ const calculateAverage = (cocktail) => {
 
 const renderAve = (ratingsAve) => {
   return `
-  <div class="ratings-average">${ratingsAve}</div>
+  <div class="ratings-average">${ratingsAve.toFixed(1)}</div>
   `;
   //star rating possible solution to use later
   // for (let i=1; i<ratingsAve; i++) {
@@ -130,6 +130,14 @@ const handleSeeReviewsEvent = (cocktail) => {
     reviewsDiv.innerHTML += `${cocktail.reviews
       .map((review) => renderReview(review))
       .join("<br>")}`;
+
+    // for each review add an event listener on update review button
+    const reviewsArray = cocktail.reviews;
+    reviewsArray.forEach((review) => {
+      const updateReviewButton = document.querySelector(`#update-review-${review.id}`);
+      updateReviewButton.dataset.id = review.id;
+      updateReviewButton.addEventListener("click", renderUpdateReviewForm);
+    });
   });
 };
 
@@ -141,15 +149,14 @@ const handleAddReviewEvent = (cocktail) => {
 
 const renderReview = (review) => {
   return `
+  <div id="review-${review.id}">
     <div class="rating">${review.rating}</div>
     <div class="review">${review.review_text}</div>
-    <button class="update-review-button" id="update-review-${review.cocktail_id}">
+    <button class="update-review-button" id="update-review-${review.id}">
     Update Review
     </button>
+  </div>
   `;
-  // const updateReviewButton = document.querySelector(`#update-review-${review.cocktail_id}`);
-  // updateReviewButton.dataset.id = review.cocktail_id;
-  // updateReviewButton.addEventListener("click", renderUpdateReviewForm);
 };
 
 const renderSeeReviewsButton = (cocktail) => {
@@ -248,20 +255,113 @@ const postNewReviewForm = (newReview) => {
         `#reviews-${newReview.cocktail_id}`
       );
       reviewsDiv.innerHTML += renderReview(reviewData);
+      const updateReviewButton = document.querySelector(`#update-review-${reviewData.id}`);
+      updateReviewButton.dataset.id = reviewData.id;
+      updateReviewButton.addEventListener("click", renderUpdateReviewForm);
     });
 };
 
-// const updateReview = (updatedReview) => {
-//   return fetch(`http://localhost:3000/reviews/${updatedReview.id}`, {
-//     method: "PATCH",
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify({rating: updatedReview.rating, review: updatedReview.review}),
-//   }).then((response) => response.json());
-// };
+const renderUpdateReviewForm = (event) => {
+  const reviewId = `${event.target.dataset.id}`;
+  const reviewDiv = document.querySelector(`#review-${reviewId}`);
+
+  reviewDiv.innerHTML += `
+  <form class="update-review-form">
+  <div class="ui form">
+  <div class="inline fields">
+    <div class="field">
+      <div class="ui radio checkbox">
+        <input type="radio" name="rating" checked="" tabindex="0" class="hidden" value="1">
+        <label>1</label>
+      </div>
+    </div>
+    <div class="field">
+      <div class="ui radio checkbox">
+        <input type="radio" name="rating" tabindex="0" class="hidden" value="2">
+        <label>2</label>
+      </div>
+    </div>
+    <div class="field">
+      <div class="ui radio checkbox">
+        <input type="radio" name="rating" tabindex="0" class="hidden" value="3">
+        <label>3</label>
+      </div>
+    </div>
+    <div class="field">
+      <div class="ui radio checkbox">
+        <input type="radio" name="rating" tabindex="0" class="hidden" value="4">
+        <label>4</label>
+      </div>
+    </div>
+    <div class="field">
+      <div class="ui radio checkbox">
+        <input type="radio" name="rating" tabindex="0" class="hidden" value="5">
+        <label>5</label>
+    </div>
+  </div>
+  </div>
+  <div class="field">
+    <label>Review</label>
+    <textarea rows="2" name="review"></textarea>
+  </div>
+  <button class="mini ui button" type="submit" >
+  Save
+  </button>
+  </form>
+  `;
+  $(".ui.radio.checkbox").checkbox();
+
+  const updateReviewForm = document.querySelector(".update-review-form");
+  updateReviewForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const ratingInput = parseInt(event.target.rating.value);
+    const reviewInput = event.target.review.value;
+
+    const review = {
+      id: reviewId,
+      rating: ratingInput,
+      review_text: reviewInput,
+    };
+    updateReview(review);
+  });
+};
+
+const updateReview = (updatedReview) => {
+  return fetch(`http://localhost:3000/reviews/${updatedReview.id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      rating: updatedReview.rating,
+      review_text: updatedReview.review_text,
+    }),
+  }).then((response) => response.json())
+    .then((updatedReviewData) => {
+    const reviewsDiv = document.querySelector(
+      `#reviews-${updatedReviewData.cocktail_id}`
+    );
+    const reviewDiv = document.querySelector(`#review-${updatedReview.id}`)
+    reviewDiv.remove()
+    reviewsDiv.innerHTML += renderReview(updatedReviewData);
+    const updateReviewButton = document.querySelector(`#update-review-${updatedReview.id}`);
+      updateReviewButton.dataset.id = updatedReview.id;
+      updateReviewButton.addEventListener("click", renderUpdateReviewForm);
+  });
+};
 
 // ******************* Events Listeners *****************
 
 verticalMenuDiv.addEventListener("click", filterCocktails);
 document.addEventListener("click", showAll);
+
+
+//user ids need to be dynamic
+//prepopulate update review form
+//update or new forms should disappear after you submit
+//validations for updating and adding a new review, first pass coud be hiding update and add buttons if not logged in
+
+//styling
+//align review buttons at bottom of cards
+//star rating
+//flip cards
