@@ -66,6 +66,16 @@ function deleteFetch() {
     .then((res) => res.json())
     .then(landingView);
 }
+
+//add cocktail show to use for buttons 
+// let updatedCocktail;
+// function getClickedCocktail(eCocktailId)
+//   fetch(`http://localhost:3000/cocktails/${eCocktailId}`)
+//   .then(res => res.json())
+//   .then ((upCocktail) => {
+//   updatedCocktail = upCocktail;
+// });
+
 // ******************* Dom Manipulation / functions *****************
 
 const login = (e) => {
@@ -139,14 +149,14 @@ const renderCocktail = (cocktail) => {
   </div>
   <form class="review-form" id=reviews-form-${cocktail.id}>
   </form>
-  ${cocktail.reviews.length === 0 ? "" : renderSeeReviewsButton(cocktail)}
+  ${renderSeeReviewsButton(cocktail)}
   <br>
   ${loggedInData.loggedIn ? renderAddReviewButton(cocktail) : ""}
 </div>
 `;
   setTimeout(() => {
-    cocktail.reviews.length > 0 ? handleSeeReviewsEvent(cocktail) : undefined;
-    loggedInData.loggedIn ? handleAddReviewEvent(cocktail) : undefined;
+    handleSeeReviewsEvent(cocktail)
+    loggedInData.loggedIn ? handleAddReviewEvent(cocktail): undefined;
   });
 };
 
@@ -188,22 +198,59 @@ const handleSeeReviewsEvent = (cocktail) => {
   const seeReviewsButton = document.querySelector(`#cocktail-${cocktail.id}`);
   const reviewsDiv = document.querySelector(`#reviews-${cocktail.id}`);
   seeReviewsButton.addEventListener("click", (event) => {
-    reviewsDiv.innerHTML = "";
-    reviewsDiv.innerHTML += `${cocktail.reviews
-      .map((review) => renderReview(review))
-      .join("<br>")}`;
+    // trying modal
+    // modal.modal('show');
+ 
+    // Refetch latest cocktail reviews
+  //   newButton.addEventListener('click', event => {
+  //     if (event.target.innerText === "Sort by Author") {
+  //         event.target.innerText = "Sort by ID"
+  //         quotesByAuthor()
+  //     } else {
+  //         event.target.innerText = "Sort by Author"
+  //         initializeQuotes()
+  //     }
+  
+  // })
+    
+    fetch(`http://localhost:3000/cocktails/${cocktail.id}`)
+    .then(res => res.json())
+    .then ((upCocktail) => {
+      updatedCocktail = upCocktail;
+      reviewsDiv.innerHTML = "";
+      let rating = `<a class=ui basic label">Average Rating &nbsp; ${calculateAverage(updatedCocktail)}</a>`
+      reviewsDiv.innerHTML += `
+      ${updatedCocktail.reviews.length === 0 ? '' : rating}
+      ${updatedCocktail.reviews.map((review) => renderReview(review)).join("<br>")}
+      `;
+        updatedCocktail.reviews.forEach((review) => {
+          const updateReviewButton = document.querySelector(`#update-review-${review.id}`);
+          if (updateReviewButton) {
+          updateReviewButton.dataset.id = review.id;
+          updateReviewButton.addEventListener("click", renderUpdateReviewForm);
+          }
+        });
+    })
+    })
+    
+    // reviewsDiv.innerHTML = "";
+    // reviewsDiv.innerHTML += `
+    // ${cocktail.reviews
+    //   .map((review) => renderReview(review))
+    //   .join("<br>")}
+    //   `;
+
+    
     // for each review add an event listener on update review button
-    const reviewsArray = cocktail.reviews;
-    reviewsArray.forEach((review) => {
-      const updateReviewButton = document.querySelector(
-        `#update-review-${review.id}`
-      );
-      if (updateReviewButton) {
-        updateReviewButton.dataset.id = review.id;
-        updateReviewButton.addEventListener("click", renderUpdateReviewForm);
-      }
-    });
-  });
+    // const reviewsArray = cocktail.reviews;
+    // reviewsArray.forEach((review) => {
+    //   const updateReviewButton = document.querySelector(`#update-review-${review.id}`);
+    //   if (updateReviewButton) {
+    //   updateReviewButton.dataset.id = review.id;
+    //   updateReviewButton.addEventListener("click", renderUpdateReviewForm);
+    //   }
+    // });
+
 };
 
 const handleAddReviewEvent = (cocktail) => {
@@ -233,15 +280,17 @@ const renderReview = (review) => {
 };
 
 const renderSeeReviewsButton = (cocktail) => {
-  return `<div class="ui labeled button" tabindex="0">
+  
+  return `
+  <div class="ui labeled button" tabindex="0">
   <div class="ui button" id="cocktail-${cocktail.id}" >
     See Reviews
   </div>
-  <a class="ui basic label">
-  Average Rating: &nbsp; ${calculateAverage(cocktail)}
-  </a>
 </div>
 `;
+{/* <a class="ui basic label"> */}
+{/* Average Rating: &nbsp; ${calculateAverage(cocktail)} */}
+{/* </a> */}
 };
 
 const renderAddReviewButton = (cocktail) => {
@@ -328,12 +377,10 @@ const postNewReviewForm = (newReview) => {
       const reviewsDiv = document.querySelector(
         `#reviews-${newReview.cocktail_id}`
       );
-      reviewsDiv.innerHTML += renderReview(reviewData);
-      const updateReviewButton = document.querySelector(
-        `#update-review-${reviewData.id}`
-      );
-      updateReviewButton.dataset.id = reviewData.id;
-      updateReviewButton.addEventListener("click", renderUpdateReviewForm);
+      // reviewsDiv.innerHTML += renderReview(reviewData);
+      // const updateReviewButton = document.querySelector(`#update-review-${reviewData.id}`);
+      // updateReviewButton.dataset.id = reviewData.id;
+      // updateReviewButton.addEventlistener("click", renderUpdateReviewForm);
     });
 };
 
@@ -399,6 +446,7 @@ const renderUpdateReviewForm = (event) => {
       review_text: reviewInput,
     };
     updateReview(review);
+    event.target.reset();
   });
 };
 
@@ -412,25 +460,19 @@ const updateReview = (updatedReview) => {
       rating: updatedReview.rating,
       review_text: updatedReview.review_text,
     }),
-  })
-    .then((response) => response.json())
-    .then((updatedReviewData) => {
-      let toBeUpdatedReview = cocktailsJSON[updatedReviewData.cocktail_id-1].reviews.find((review)=>review.id ===updatedReviewData.id)
-      toBeUpdatedReview.rating = updatedReviewData.rating
-      toBeUpdatedReview.review_text = updatedReviewData.review_text
-      
-      const reviewsDiv = document.querySelector(
-        `#reviews-${updatedReviewData.cocktail_id}`
-      );
-      const reviewDiv = document.querySelector(`#review-${updatedReview.id}`);
-      reviewDiv.remove();
-      reviewsDiv.innerHTML += renderReview(updatedReviewData);
-      const updateReviewButton = document.querySelector(
-        `#update-review-${updatedReview.id}`
-      );
-      updateReviewButton.dataset.id = updatedReview.id;
-      updateReviewButton.addEventListener("click", renderUpdateReviewForm);
-    });
+  }).then((response) => response.json())
+    .then((updatedReviewData) => { //we only need to see and reset form (done previously)
+    // const reviewsDiv = document.querySelector(
+    //   `#reviews-${updatedReviewData.cocktail_id}`
+    // );
+    // const reviewDiv = document.querySelector(`#review-${updatedReview.id}`)
+    // reviewDiv.remove()
+    // reviewsDiv.innerHTML += renderReview(updatedReviewData);
+    // const updateReviewButton = document.querySelector(`#update-review-${updatedReview.id}`);
+    //   updateReviewButton.dataset.id = updatedReview.id;
+    //   updateReviewButton.addEventListener("click", renderUpdateReviewForm);
+    
+  });
 };
 
 let loggedInData = {
