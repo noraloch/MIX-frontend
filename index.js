@@ -2,13 +2,15 @@
 
 const cocktailCardDiv = document.querySelector(".cocktail-cards");
 
-const verticalMenuDiv = Array.from(document.getElementsByClassName("ui vertical fluid tabular menu"))[0];
+const verticalMenuDiv = Array.from(
+  document.getElementsByClassName("ui vertical fluid tabular menu")
+)[0];
 let loginForm = document.querySelector("#login-form");
 let lIMenu = document.querySelector("#lIMenu");
-let menuArea = document.querySelector("#menu-area")
+let menuArea = document.querySelector("#menu-area");
 let signUpBtn = menuArea.querySelector("button");
 const all = document.querySelector(".all");
-
+let cocktailsJSON;
 
 // ******************* Network Requests *****************
 const getCocktails = () => {
@@ -29,22 +31,21 @@ const getTastes = () => {
 
 getTastes();
 
-
 let usernameId;
-function usernameFetch(input){
- return fetch(`http://localhost:3000/users/${input}`)
-  .then(res => res.json())
-  .then(object=>{
-      if (object === null || input === ""){
-        return landingView()
-      }else{
-        usernameId = object.id
-        return loggedInView(input)
+function usernameFetch(input) {
+  return fetch(`http://localhost:3000/users/${input}`)
+    .then((res) => res.json())
+    .then((object) => {
+      if (object === null || input === "") {
+        return landingView();
+      } else {
+        usernameId = object.id;
+        return loggedInView(input);
       }
-  })
+    });
 }
 
-function postUserFetch(newUser){
+function postUserFetch(newUser) {
   fetch(`http://localhost:3000/users`, {
     method: "POST",
     headers: {
@@ -52,25 +53,25 @@ function postUserFetch(newUser){
     },
     body: JSON.stringify(newUser),
   })
-    .then(res => res.json())
-    .then(newObj => {
-      newObj.id ? loggedInView(newObj.name) : renderSignUpForm(false) ; 
-    })
+    .then((res) => res.json())
+    .then((newObj) => {
+      newObj.id ? loggedInView(newObj.name) : renderSignUpForm(false);
+    });
 }
 
-function deleteFetch(){
+function deleteFetch() {
   fetch(`http://localhost:3000/users/${loggedInData.loggedInUsername}`, {
-    method: "DELETE"
+    method: "DELETE",
   })
-  .then(res => res.json())
-  .then(landingView)
+    .then((res) => res.json())
+    .then(landingView);
 }
 // ******************* Dom Manipulation / functions *****************
 
 const login = (e) => {
   e.preventDefault();
   const usernameInput = e.target.username.value;
-  usernameFetch(usernameInput)
+  usernameFetch(usernameInput);
 };
 
 const showSideBar = (categoriesArray) => {
@@ -97,19 +98,18 @@ function filterCocktails(e) {
   cocktailCardDiv.innerHTML = "";
 
   // Populate cocktailCardDiv with all of the categoryCocktails
-  categoryCocktails.forEach(cocktail => {
+  categoryCocktails.forEach((cocktail) => {
     renderCocktail(cocktail);
   });
-
 }
 function showAll(e) {
   if (e.target.id === "show-all-btn") {
     getAndRenderCocktails();
   }
-
 }
 
-{/* <div class="ui card five wide column">
+{
+  /* <div class="ui card five wide column">
 <div class="image">
   <img src=${cocktail.image}>
 </div>
@@ -122,7 +122,8 @@ function showAll(e) {
   </div>
   <form class="review-form" id=reviews-form-${cocktail.id}>
   </form>
-</div> */}
+</div> */
+}
 
 const renderCocktail = (cocktail) => {
   cocktailCardDiv.innerHTML += `
@@ -140,12 +141,12 @@ const renderCocktail = (cocktail) => {
   </form>
   ${cocktail.reviews.length === 0 ? "" : renderSeeReviewsButton(cocktail)}
   <br>
-  ${loggedInData.loggedIn ? renderAddReviewButton(cocktail): ""}
+  ${loggedInData.loggedIn ? renderAddReviewButton(cocktail) : ""}
 </div>
 `;
   setTimeout(() => {
-    cocktail.reviews.length > 0 ? handleSeeReviewsEvent(cocktail): undefined;
-    loggedInData.loggedIn ? handleAddReviewEvent(cocktail): undefined;
+    cocktail.reviews.length > 0 ? handleSeeReviewsEvent(cocktail) : undefined;
+    loggedInData.loggedIn ? handleAddReviewEvent(cocktail) : undefined;
   });
 };
 
@@ -157,6 +158,7 @@ const getAndRenderCocktails = () => {
   cocktailCardDiv.innerHTML = "";
   getCocktails().then((cocktailData) => {
     cocktailData.forEach((cocktail) => renderCocktail(cocktail));
+    cocktailsJSON = cocktailData;
   });
 };
 
@@ -190,14 +192,15 @@ const handleSeeReviewsEvent = (cocktail) => {
     reviewsDiv.innerHTML += `${cocktail.reviews
       .map((review) => renderReview(review))
       .join("<br>")}`;
-
     // for each review add an event listener on update review button
     const reviewsArray = cocktail.reviews;
     reviewsArray.forEach((review) => {
-      const updateReviewButton = document.querySelector(`#update-review-${review.id}`);
+      const updateReviewButton = document.querySelector(
+        `#update-review-${review.id}`
+      );
       if (updateReviewButton) {
-      updateReviewButton.dataset.id = review.id;
-      updateReviewButton.addEventListener("click", renderUpdateReviewForm);
+        updateReviewButton.dataset.id = review.id;
+        updateReviewButton.addEventListener("click", renderUpdateReviewForm);
       }
     });
   });
@@ -212,15 +215,19 @@ const handleAddReviewEvent = (cocktail) => {
 const renderUpdateButton = (review) => {
   return `<button class="update-review-button" id="update-review-${review.id}">
   Update Review
-  </button>`
-}
+  </button>`;
+};
 
 const renderReview = (review) => {
   return `
   <div id="review-${review.id}">
     <div class="rating">${review.rating}</div>
     <div class="review">${review.review_text}</div>
-    ${loggedInData.loggedInId === review.user_id ? renderUpdateButton(review) : ""} 
+    ${
+      loggedInData.loggedInId === review.user_id
+        ? renderUpdateButton(review)
+        : ""
+    } 
   </div>
   `;
 };
@@ -302,7 +309,7 @@ const renderNewReviewForm = (event) => {
       rating: ratingInput,
       review_text: reviewInput,
     };
-    reviewForm.innerHTML = ""
+    reviewForm.innerHTML = "";
     postNewReviewForm(review);
   });
 };
@@ -317,11 +324,14 @@ const postNewReviewForm = (newReview) => {
   })
     .then((response) => response.json())
     .then((reviewData) => {
+      cocktailsJSON[reviewData.cocktail_id - 1].reviews.push(reviewData);
       const reviewsDiv = document.querySelector(
         `#reviews-${newReview.cocktail_id}`
       );
       reviewsDiv.innerHTML += renderReview(reviewData);
-      const updateReviewButton = document.querySelector(`#update-review-${reviewData.id}`);
+      const updateReviewButton = document.querySelector(
+        `#update-review-${reviewData.id}`
+      );
       updateReviewButton.dataset.id = reviewData.id;
       updateReviewButton.addEventListener("click", renderUpdateReviewForm);
     });
@@ -402,61 +412,67 @@ const updateReview = (updatedReview) => {
       rating: updatedReview.rating,
       review_text: updatedReview.review_text,
     }),
-  }).then((response) => response.json())
+  })
+    .then((response) => response.json())
     .then((updatedReviewData) => {
-    const reviewsDiv = document.querySelector(
-      `#reviews-${updatedReviewData.cocktail_id}`
-    );
-    const reviewDiv = document.querySelector(`#review-${updatedReview.id}`)
-    reviewDiv.remove()
-    reviewsDiv.innerHTML += renderReview(updatedReviewData);
-    const updateReviewButton = document.querySelector(`#update-review-${updatedReview.id}`);
+      let toBeUpdatedReview = cocktailsJSON[updatedReviewData.cocktail_id-1].reviews.find((review)=>review.id ===updatedReviewData.id)
+      toBeUpdatedReview.rating = updatedReviewData.rating
+      toBeUpdatedReview.review_text = updatedReviewData.review_text
+      
+      const reviewsDiv = document.querySelector(
+        `#reviews-${updatedReviewData.cocktail_id}`
+      );
+      const reviewDiv = document.querySelector(`#review-${updatedReview.id}`);
+      reviewDiv.remove();
+      reviewsDiv.innerHTML += renderReview(updatedReviewData);
+      const updateReviewButton = document.querySelector(
+        `#update-review-${updatedReview.id}`
+      );
       updateReviewButton.dataset.id = updatedReview.id;
       updateReviewButton.addEventListener("click", renderUpdateReviewForm);
-  });
+    });
 };
 
 let loggedInData = {
   loggedIn: false,
   loggedInUsername: undefined,
-  loggedInId: undefined
+  loggedInId: undefined,
 };
 
-function loggedInView(name){
+function loggedInView(name) {
   // all.innerHTML = "";
   lIMenu.innerHTML = "";
   menuArea.innerHTML = `
     <a class="item">Logout</a> 
     <a class="item" id="delete">Delete Account</a> 
     <class = "inline field"><h5 class="ui yellow inverted header">Hello ${name}!</h5>
-    ` 
-    loggedInData = {
-      loggedIn: true,
-      loggedInUsername: name,
-      loggedInId: usernameId
-    }
-
-    getAndRenderCocktails();
-    let logoutBtn = menuArea.querySelector('a');
-    logoutBtn.addEventListener('click', landingView); 
-
-    let deleteAccounteBtn = menuArea.querySelector("#delete");
-    deleteAccounteBtn.addEventListener("click", deleteFetch)
-};
-
-  function landingView(){
-  // console.log("not a user");
-    loggedInData = {
-      loggedIn: false,
-      loggedInUsername: undefined,
-      loggedInId: undefined
-    }
-    renderBarBack()
-    getAndRenderCocktails();
-    
+    `;
+  loggedInData = {
+    loggedIn: true,
+    loggedInUsername: name,
+    loggedInId: usernameId,
   };
 
-function renderBarBack(){
+  getAndRenderCocktails();
+  let logoutBtn = menuArea.querySelector("a");
+  logoutBtn.addEventListener("click", landingView);
+
+  let deleteAccounteBtn = menuArea.querySelector("#delete");
+  deleteAccounteBtn.addEventListener("click", deleteFetch);
+}
+
+function landingView() {
+  // console.log("not a user");
+  loggedInData = {
+    loggedIn: false,
+    loggedInUsername: undefined,
+    loggedInId: undefined,
+  };
+  renderBarBack();
+  getAndRenderCocktails();
+}
+
+function renderBarBack() {
   lIMenu.innerHTML = `
   <form id="login-form">
   <div class="ui form">
@@ -467,7 +483,7 @@ function renderBarBack(){
     </div>
   </div>
   </form>
-`
+`;
   menuArea.innerHTML = `
   <br>
   <button class="ui animated button" tabindex="0">
@@ -476,19 +492,18 @@ function renderBarBack(){
       <i class="right arrow icon"></i>
     </div>
   </button>
-` 
-let signUpBtn = menuArea.querySelector("button");
-signUpBtn.addEventListener('click', renderSignUpForm);
-
+`;
+  let signUpBtn = menuArea.querySelector("button");
+  signUpBtn.addEventListener("click", renderSignUpForm);
 }
 
 let signUpForm;
-function renderSignUpForm(result){
-    // e.preventDefault();
-    // menuArea.innerHTML = "";
-    // all.innerHTML = "";
-    cocktailCardDiv.innerHTML = ""
-    cocktailCardDiv.innerHTML =  `
+function renderSignUpForm(result) {
+  // e.preventDefault();
+  // menuArea.innerHTML = "";
+  // all.innerHTML = "";
+  cocktailCardDiv.innerHTML = "";
+  cocktailCardDiv.innerHTML = `
     <br><br><br><br>
     <div class="ui inverted segment container">
     <div class="ui inverted form">
@@ -508,24 +523,22 @@ function renderSignUpForm(result){
     <span> ${result ? "" : "Invalid Username!"}</span>
     </div>
   </div>
-    `
-    signUpForm = all.querySelector("form");
-    
-    signUpForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      let userObj = {
-        name: e.target.username.value,
-        age: parseInt(e.target.age.value)
-      }
-      postUserFetch(userObj);
-    });
+    `;
+  signUpForm = all.querySelector("form");
 
-  }
+  signUpForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    let userObj = {
+      name: e.target.username.value,
+      age: parseInt(e.target.age.value),
+    };
+    postUserFetch(userObj);
+  });
+}
 
 // ******************* Events Listeners *****************
 verticalMenuDiv.addEventListener("click", filterCocktails);
 document.addEventListener("click", showAll);
-
 
 //prepopulate update review form
 //seeding
@@ -542,11 +555,7 @@ document.addEventListener("click", showAll);
 //flip cards
 //background
 
-
-verticalMenuDiv.addEventListener('click', filterCocktails);
-document.addEventListener('click', showAll);
-loginForm.addEventListener('submit', login);
-signUpBtn.addEventListener('click', renderSignUpForm);
-
-
-
+verticalMenuDiv.addEventListener("click", filterCocktails);
+document.addEventListener("click", showAll);
+loginForm.addEventListener("submit", login);
+signUpBtn.addEventListener("click", renderSignUpForm);
