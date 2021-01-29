@@ -377,7 +377,7 @@ const postNewReviewForm = (newReview) => {
       const reviewsDiv = document.querySelector(
         `#reviews-${newReview.cocktail_id}`
       );
-      // reviewsDiv.innerHTML += renderReview(reviewData);
+      reviewsDiv.innerHTML += renderReview(reviewData);
       // const updateReviewButton = document.querySelector(`#update-review-${reviewData.id}`);
       // updateReviewButton.dataset.id = reviewData.id;
       // updateReviewButton.addEventlistener("click", renderUpdateReviewForm);
