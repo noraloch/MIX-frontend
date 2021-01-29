@@ -461,16 +461,16 @@ const updateReview = (updatedReview) => {
       review_text: updatedReview.review_text,
     }),
   }).then((response) => response.json())
-    .then((updatedReviewData) => { //we only need to see and reset form (done previously)
-    // const reviewsDiv = document.querySelector(
-    //   `#reviews-${updatedReviewData.cocktail_id}`
-    // );
-    // const reviewDiv = document.querySelector(`#review-${updatedReview.id}`)
-    // reviewDiv.remove()
-    // reviewsDiv.innerHTML += renderReview(updatedReviewData);
-    // const updateReviewButton = document.querySelector(`#update-review-${updatedReview.id}`);
-    //   updateReviewButton.dataset.id = updatedReview.id;
-    //   updateReviewButton.addEventListener("click", renderUpdateReviewForm);
+    .then((updatedReviewData) => {
+    const reviewsDiv = document.querySelector(
+      `#reviews-${updatedReviewData.cocktail_id}`
+    );
+    const reviewDiv = document.querySelector(`#review-${updatedReview.id}`)
+    reviewDiv.remove()
+    reviewsDiv.innerHTML += renderReview(updatedReviewData);
+    const updateReviewButton = document.querySelector(`#update-review-${updatedReview.id}`);
+      updateReviewButton.dataset.id = updatedReview.id;
+      updateReviewButton.addEventListener("click", renderUpdateReviewForm);
     
   });
 };
