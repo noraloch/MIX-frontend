@@ -183,7 +183,7 @@ const calculateAverage = (cocktail) => {
 
 const renderAve = (ratingsAve) => {
   return `
-  <div class="ratings-average">${ratingsAve.toFixed(1)}</div>
+  <a class="ratings-average">${ratingsAve.toFixed(1)}</a>
   `;
   //star rating possible solution to use later
   // for (let i=1; i<ratingsAve; i++) {
@@ -288,9 +288,9 @@ const renderSeeReviewsButton = (cocktail) => {
   </div>
 </div>
 `;
-{/* <a class="ui basic label"> */}
-{/* Average Rating: &nbsp; ${calculateAverage(cocktail)} */}
-{/* </a> */}
+// {/* <a class="ui basic label"> */}
+// {/* Average Rating: &nbsp; ${calculateAverage(cocktail)} */}
+// {/* </a> */}
 };
 
 const renderAddReviewButton = (cocktail) => {
