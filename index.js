@@ -582,6 +582,12 @@ function renderSignUpForm(result) {
 verticalMenuDiv.addEventListener("click", filterCocktails);
 document.addEventListener("click", showAll);
 
+
+verticalMenuDiv.addEventListener("click", filterCocktails);
+document.addEventListener("click", showAll);
+loginForm.addEventListener("submit", login);
+signUpBtn.addEventListener("click", renderSignUpForm);
+
 //prepopulate update review form
 //seeding
 //X if no reviews for cocktail don't show average
@@ -596,8 +602,3 @@ document.addEventListener("click", showAll);
 //star rating
 //flip cards
 //background
-
-verticalMenuDiv.addEventListener("click", filterCocktails);
-document.addEventListener("click", showAll);
-loginForm.addEventListener("submit", login);
-signUpBtn.addEventListener("click", renderSignUpForm);
